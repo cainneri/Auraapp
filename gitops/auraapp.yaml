@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auraapp
+  namespace: auraapp-cicd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auraapp
+  template:
+    metadata:
+      labels:
+        app: auraapp
+    spec:
+      containers:
+        - name: auraapp
+          image: image-registry.openshift-image-registry.svc:5000/auraapp-cicd/auraapp@sha256:b4e8931582ed44b2d054756195f27842e3cc1b88d30d98e973613683b085e748
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auraapp
+  namespace: auraapp-cicd
+spec:
+  selector:
+    app: auraapp
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: auraapp
+  namespace: auraapp-cicd
+spec:
+  to:
+    kind: Service
+    name: auraapp
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
