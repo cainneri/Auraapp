@@ -76,16 +76,16 @@ type Node struct {
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	
+
 	http.HandleFunc("/api/accounts", accountsHandler)
 	http.HandleFunc("/api/clusters", clustersHandler)
 
-	fs := http.FileServer(http.Dir("./static"))
+	fs := http.FileServer(http.FS(mustStaticFS()))
 	http.Handle("/", fs)
 
 	port := ":8080"
 	log.Printf("Starting server on http://localhost%s", port)
-	
+
 	server := &http.Server{
 		Addr:         port,
 		ReadTimeout:  5 * time.Second,
@@ -100,7 +100,7 @@ func main() {
 
 func accountsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	
+
 	accounts := []Account{
 		{
 			ID:               "kamal",
@@ -205,11 +205,11 @@ func accountsHandler(w http.ResponseWriter, r *http.Request) {
 func clustersHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	accountID := r.URL.Query().Get("accountID")
-	
+
 	var clusters []Cluster
 	count := 50
 	prefix := "cluster"
-	
+
 	switch accountID {
 	case "kamal":
 		count = 258
@@ -233,7 +233,7 @@ func clustersHandler(w http.ResponseWriter, r *http.Request) {
 	for i := 1; i <= count; i++ {
 		clusterName := fmt.Sprintf("%s-%02d", prefix, i)
 		assignedVersion := ocpVersions[i%len(ocpVersions)]
-		
+
 		var nodes []Node
 		for m := 1; m <= 3; m++ {
 			nodes = append(nodes, Node{Name: fmt.Sprintf("%s-master-%02d", clusterName, m), Role: "Master"})
