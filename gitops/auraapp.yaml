@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: auraapp
-          image: image-registry.openshift-image-registry.svc:5000/auraapp-cicd/auraapp@sha256:b4e8931582ed44b2d054756195f27842e3cc1b88d30d98e973613683b085e748
+          image: image-registry.openshift-image-registry.svc:5000/auraapp-cicd/auraapp@sha256:f83bc16dc021971581f48df91b3ffddda644de24a2c12129b66d6be12d6a1493
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
